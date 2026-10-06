@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario Plano y Elegante</title>
+  <link rel="stylesheet" href="css/style-formularios.css">
+</head>
+<body>
+
+  <div class="form-container">
+    <h2 class="form-title">Registro de Usuario</h2>
+    
+    <form action="#" method="POST">
+      <!-- Input de Texto -->
+      <div class="form-group">
+        <label for="nombre" class="form-label">Nombre completo</label>
+        <input type="text" id="nombre" class="form-input" placeholder="Ej. Juan Pérez" required>
+      </div>
+
+      <!-- Input de Texto / Correo -->
+      <div class="form-group">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input type="text" id="email" class="form-input" placeholder="usuario@ejemplo.com" required>
+      </div>
+
+      <!-- Control Select -->
+      <div class="form-group">
+        <label for="rol" class="form-label">Rol del usuario</label>
+        <select id="rol" class="form-select" required>
+          <option value="" disabled selected>Selecciona una opción</option>
+          <option value="desarrollador">Desarrollador Backend</option>
+          <option value="disenador">Diseñador UX/UI</option>
+          <option value="administrador">Administrador de Sistemas</option>
+        </select>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Guardar Datos</button>
+        <button type="reset" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

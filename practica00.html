@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador y Visor de Tablas CSS3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        /* Transición suave para controles del panel */
+        .color-picker-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .color-picker-wrapper input[type="color"] {
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            width: 150%;
+            height: 150%;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Contenedor dinámico de estilos CSS3 para la tabla de prueba -->
+    <style id="dynamic-table-styles">
+        /* Estilos generados en tiempo real */
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-blue-600 rounded-lg text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+                    &lt;/&gt;
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">
+                        Estilizador de Tablas CSS3
+                    </h1>
+                    <p class="text-xs text-slate-400">Filas cebreadas, efectos hover y personalización en tiempo real</p>
+                </div>
+            </div>
+
+            <!-- Navegación por pestañas principales -->
+            <div class="flex items-center space-x-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button id="tab-preview-btn" onclick="switchTab('preview')" class="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm transition-all">
+                    👁️ Vista Previa e Interacción
+                </button>
+                <button id="tab-code-btn" onclick="switchTab('code')" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all">
+                    📄 Exportar Código HTML/CSS
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- PANEL DE CONTROL Y PERSONALIZACIÓN (COLUMNA IZQUIERDA) -->
+        <aside class="lg:col-span-4 space-y-6">
+            
+            <!-- Selector de Temas Predefinidos -->
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-xl">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <span>🎨</span> Presets de Temas
+                </h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="applyPreset('modern-blue')" class="px-3 py-2 text-xs font-medium bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg text-left flex items-center justify-between group">
+                        <span>Moderno Azul</span>
+                        <span class="w-3 h-3 rounded-full bg-blue-500 inline-block border border-white/20"></span>
+                    </button>
+                    <button onclick="applyPreset('dark-mode')" class="px-3 py-2 text-xs font-medium bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg text-left flex items-center justify-between group">
+                        <span>Modo Oscuro</span>
+                        <span class="w-3 h-3 rounded-full bg-slate-900 inline-block border border-slate-500"></span>
+                    </button>
+                    <button onclick="applyPreset('emerald')" class="px-3 py-2 text-xs font-medium bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg text-left flex items-center justify-between group">
+                        <span>Esmeralda Pro</span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block border border-white/20"></span>
+                    </button>
+                    <button onclick="applyPreset('minimal')" class="px-3 py-2 text-xs font-medium bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg text-left flex items-center justify-between group">
+                        <span>Mínimo Claro</span>
+                        <span class="w-3 h-3 rounded-full bg-gray-200 inline-block border border-slate-400"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Personalizador de Parámetros CSS -->
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-xl space-y-4">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+                    <span>⚙️</span> Personalizador CSS3
+                </h2>
+
+                <!-- Selector de Colores de Encabezado -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">Encabezado (&lt;th&gt;)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Fondo</span>
+                            <input type="color" id="cfg-header-bg" value="#1e293b" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Texto</span>
+                            <input type="color" id="cfg-header-text" value="#ffffff" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selector de Filas Cebreadas -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">Filas Cebreadas (:nth-child)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Fila Impar (Odd)</span>
+                            <input type="color" id="cfg-row-odd" value="#ffffff" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Fila Par (Even)</span>
+                            <input type="color" id="cfg-row-even" value="#f8fafc" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selector de Fila Activa Hover -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">Efecto Hover en Fila Activa (:hover)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Fondo Hover</span>
+                            <input type="color" id="cfg-hover-bg" value="#e0f2fe" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs text-slate-400">Texto Hover</span>
+                            <input type="color" id="cfg-hover-text" value="#0369a1" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bordes y Texto de Celdas -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">Color de Texto de Celdas</label>
+                    <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+                        <span class="text-xs text-slate-400">Texto Celdas (&lt;td&gt;)</span>
+                        <input type="color" id="cfg-cell-text" value="#334155" oninput="updateStyles()" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent">
+                    </div>
+                </div>
+
+                <!-- Sliders de Dimensiones y Espaciado -->
+                <div class="space-y-3 pt-2 border-t border-slate-700">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300">Padding de Celdas (Espaciado)</span>
+                            <span id="lbl-padding" class="text-blue-400 font-mono">12px 16px</span>
+                        </div>
+                        <input type="range" id="cfg-padding" min="6" max="24" value="12" oninput="updateStyles()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300">Radio de Bordes (Border Radius)</span>
+                            <span id="lbl-radius" class="text-blue-400 font-mono">10px</span>
+                        </div>
+                        <input type="range" id="cfg-radius" min="0" max="20" value="10" oninput="updateStyles()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300">Velocidad Transición Hover</span>
+                            <span id="lbl-transition" class="text-blue-400 font-mono">0.2s</span>
+                        </div>
+                        <input type="range" id="cfg-transition" min="0" max="10" value="2" oninput="updateStyles()" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL DE VISTA PREVIA Y CÓDIGO (COLUMNA DERECHA) -->
+        <section class="lg:col-span-8 flex flex-col space-y-6">
+
+            <!-- PESTAÑA 1: VISTA PREVIA INTERACTIVA -->
+            <div id="section-preview" class="space-y-4">
+                
+                <!-- Barra de Búsqueda y Configuración de Paginación -->
+                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            🔍
+                        </span>
+                        <input type="text" id="search-input" oninput="onSearchChange()" placeholder="Buscar en la tabla por cualquier campo..." class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors">
+                    </div>
+
+                    <div class="flex items-center space-x-2 text-xs text-slate-400">
+                        <span>Mostrar:</span>
+                        <select id="items-per-page" onchange="onPageSizeChange()" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-blue-500">
+                            <option value="5">5 filas</option>
+                            <option value="10" selected>10 filas</option>
+                            <option value="15">15 filas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contenedor Envolvente de la Tabla Dinámica -->
+                <div class="bg-slate-800/40 border border-slate-700/80 rounded-2xl p-4 shadow-2xl backdrop-blur-sm">
+                    <div id="table-wrapper" class="w-full overflow-x-auto rounded-xl">
+                        <!-- LA TABLA SERÁ RENDERIZADA DINÁMICAMENTE AQUÍ -->
+                        <table id="demo-table" class="custom-styled-table w-full border-collapse">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)" class="cursor-pointer select-none">
+                                        <div class="flex items-center justify-between">
+                                            <span>ID</span>
+                                            <span id="sort-icon-0" class="text-xs text-slate-400">↕</span>
+                                        </div>
+                                    </th>
+                                    <th onclick="sortTable(1)" class="cursor-pointer select-none">
+                                        <div class="flex items-center justify-between">
+                                            <span>Usuario</span>
+                                            <span id="sort-icon-1" class="text-xs text-slate-400">↕</span>
+                                        </div>
+                                    </th>
+                                    <th onclick="sortTable(2)" class="cursor-pointer select-none">
+                                        <div class="flex items-center justify-between">
+                                            <span>Puesto / Rol</span>
+                                            <span id="sort-icon-2" class="text-xs text-slate-400">↕</span>
+                                        </div>
+                                    </th>
+                                    <th onclick="sortTable(3)" class="cursor-pointer select-none">
+                                        <div class="flex items-center justify-between">
+                                            <span>Estado</span>
+                                            <span id="sort-icon-3" class="text-xs text-slate-400">↕</span>
+                                        </div>
+                                    </th>
+                                    <th onclick="sortTable(4)" class="cursor-pointer select-none">
+                                        <div class="flex items-center justify-between">
+                                            <span>Salario</span>
+                                            <span id="sort-icon-4" class="text-xs text-slate-400">↕</span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Las filas se insertan con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación e Información -->
+                    <div class="mt-4 flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-slate-700/50 text-xs text-slate-400">
+                        <div id="pagination-info">
+                            Showing 0 to 0 of 0 entries
+                        </div>
+                        <div class="flex items-center space-x-1" id="pagination-controls">
+                            <!-- Botones de página creados por JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Explicativa de Conceptos CSS3 Usados -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-slate-800/40 border border-slate-700/60 p-4 rounded-xl">
+                        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">1. Filas Cebreadas (Zebra Striping)</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Aplica la pseudoclase de CSS3 <code class="text-pink-400 bg-slate-900 px-1 rounded">:nth-child(even)</code> o <code class="text-pink-400 bg-slate-900 px-1 rounded">:nth-child(odd)</code> para alternar el fondo entre filas impares y pares sin agregar clases HTML manuales.
+                        </p>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 p-4 rounded-xl">
+                        <h3 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1">2. Hover en Fila Activa</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Utiliza <code class="text-pink-400 bg-slate-900 px-1 rounded">tbody tr:hover</code> junto con <code class="text-pink-400 bg-slate-900 px-1 rounded">transition</code> para dar retroalimentación visual al usuario en la fila seleccionada o inspeccionada.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PESTAÑA 2: VISOR Y EXPORTADOR DE CÓDIGO HTML/CSS -->
+            <div id="section-code" class="hidden space-y-6">
+                
+                <!-- Selector de Tipo de Código -->
+                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-sm font-semibold text-white">Código HTML y CSS3 Listo para Usar</h2>
+                        <p class="text-xs text-slate-400">Copia los estilos generados con tus ajustes personalizados actuales.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="copyCode('all')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 shadow-md">
+                            📋 Copiar Todo (HTML + CSS)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bloque CSS -->
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center">
+                        <span class="text-xs font-mono text-blue-400 font-semibold flex items-center gap-2">
+                            <span>🎨</span> estilos-tabla.css
+                        </span>
+                        <button onclick="copyCode('css')" class="text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded transition-colors">
+                            Copiar CSS
+                        </button>
+                    </div>
+                    <pre class="p-4 text-xs text-slate-200 overflow-x-auto"><code id="code-css"></code></pre>
+                </div>
+
+                <!-- Bloque HTML -->
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center">
+                        <span class="text-xs font-mono text-emerald-400 font-semibold flex items-center gap-2">
+                            <span>📄</span> estructura-tabla.html
+                        </span>
+                        <button onclick="copyCode('html')" class="text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded transition-colors">
+                            Copiar HTML
+                        </button>
+                    </div>
+                    <pre class="p-4 text-xs text-slate-200 overflow-x-auto"><code id="code-html"></code></pre>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- NOTIFICACIÓN TOAST INLINE -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-2xl border border-emerald-400 text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 pointer-events-none z-50">
+        <span>✅</span>
+        <span id="toast-msg">¡Código copiado exitosamente al portapapeles!</span>
+    </div>
+
+    <script>
+        // Datos de muestra para la tabla
+        const sampleData = [
+            { id: "USR-001", user: "Juan Pérez", role: "Desarrollador Backend", status: "Activo", salary: "$3,800" },
+            { id: "USR-002", user: "María García", role: "Diseñadora UX/UI", status: "Activo", salary: "$3,400" },
+            { id: "USR-003", user: "Carlos Mendoza", role: "DBA PostgreSQL", status: "Inactivo", salary: "$4,100" },
+            { id: "USR-004", user: "Ana Martínez", role: "Frontend Developer", status: "Activo", salary: "$3,600" },
+            { id: "USR-005", user: "Roberto Gómez", role: "DevOps Engineer", status: "Pendiente", salary: "$4,500" },
+            { id: "USR-006", user: "Laura Torres", role: "Product Manager", status: "Activo", salary: "$4,800" },
+            { id: "USR-007", user: "Diego Silva", role: "QA Engineer", status: "Inactivo", salary: "$2,900" },
+            { id: "USR-008", user: "Elena Rojas", role: "Data Scientist", status: "Activo", salary: "$4,600" },
+            { id: "USR-009", user: "Fernando Castro", role: "Sistemas & Redes", status: "Activo", salary: "$3,200" },
+            { id: "USR-010", user: "Sofia López", role: "Scrum Master", status: "Activo", salary: "$3,900" },
+            { id: "USR-011", user: "Gabriel Ruiz", role: "Cloud Architect", status: "Pendiente", salary: "$5,200" },
+            { id: "USR-012", user: "Patricia Vega", role: "Security Specialist", status: "Activo", salary: "$4,700" }
+        ];
+
+        // Estado global de la aplicación
+        let filteredData = [...sampleData];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let currentSortColumn = -1;
+        let currentSortDirection = 'asc';
+
+        // Presets de temas de diseño
+        const presets = {
+            'modern-blue': {
+                headerBg: '#1e293b',
+                headerText: '#ffffff',
+                rowOdd: '#ffffff',
+                rowEven: '#f8fafc',
+                hoverBg: '#e0f2fe',
+                hoverText: '#0369a1',
+                cellText: '#334155',
+                padding: '12',
+                radius: '10',
+                transition: '2'
+            },
+            'dark-mode': {
+                headerBg: '#0f172a',
+                headerText: '#38bdf8',
+                rowOdd: '#1e293b',
+                rowEven: '#0f172a',
+                hoverBg: '#334155',
+                hoverText: '#f8fafc',
+                cellText: '#94a3b8',
+                padding: '14',
+                radius: '12',
+                transition: '2'
+            },
+            'emerald': {
+                headerBg: '#065f46',
+                headerText: '#ecfdf5',
+                rowOdd: '#ffffff',
+                rowEven: '#f0fdf4',
+                hoverBg: '#dcfce7',
+                hoverText: '#15803d',
+                cellText: '#1e293b',
+                padding: '12',
+                radius: '8',
+                transition: '3'
+            },
+            'minimal': {
+                headerBg: '#f1f5f9',
+                headerText: '#0f172a',
+                rowOdd: '#ffffff',
+                rowEven: '#fafafa',
+                hoverBg: '#f3f4f6',
+                hoverText: '#111827',
+                cellText: '#4b5563',
+                padding: '10',
+                radius: '4',
+                transition: '1'
+            }
+        };
+
+        // Inicialización al cargar la página
+        window.onload = function() {
+            applyPreset('modern-blue');
+            renderTable();
+        };
+
+        // Renderizar tabla con datos paginados y filtrados
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + parseInt(itemsPerPage);
+            const pageItems = filteredData.slice(startIdx, endIdx);
+
+            if (pageItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 24px; color: #94a3b8;">
+                            No se encontraron resultados coincidentes con tu búsqueda.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                pageItems.forEach(item => {
+                    const tr = document.createElement('tr');
+                    
+                    // Colores de los badges según estado
+                    let statusBadgeClass = "bg-emerald-100 text-emerald-800";
+                    if (item.status === 'Inactivo') statusBadgeClass = "bg-rose-100 text-rose-800";
+                    if (item.status === 'Pendiente') statusBadgeClass = "bg-amber-100 text-amber-800";
+
+                    tr.innerHTML = `
+                        <td style="font-weight: 600;">${item.id}</td>
+                        <td style="font-weight: 500;">${item.user}</td>
+                        <td>${item.role}</td>
+                        <td>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${statusBadgeClass}">
+                                ${item.status}
+                            </span>
+                        </td>
+                        <td style="font-family: monospace; font-weight: 600;">${item.salary}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            renderPagination();
+        }
+
+        // Búsqueda en tiempo real
+        function onSearchChange() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            filteredData = sampleData.filter(item => {
+                return item.id.toLowerCase().includes(query) ||
+                       item.user.toLowerCase().includes(query) ||
+                       item.role.toLowerCase().includes(query) ||
+                       item.status.toLowerCase().includes(query) ||
+                       item.salary.toLowerCase().includes(query);
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Cambio de cantidad por página
+        function onPageSizeChange() {
+            itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Ordenar por columnas
+        function sortTable(columnIndex) {
+            const keys = ['id', 'user', 'role', 'status', 'salary'];
+            const key = keys[columnIndex];
+
+            if (currentSortColumn === columnIndex) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = columnIndex;
+                currentSortDirection = 'asc';
+            }
+
+            // Actualizar íconos visuales
+            for (let i = 0; i < 5; i++) {
+                const icon = document.getElementById(`sort-icon-${i}`);
+                if (i === columnIndex) {
+                    icon.textContent = currentSortDirection === 'asc' ? '▲' : '▼';
+                    icon.className = "text-xs text-blue-400 font-bold";
+                } else {
+                    icon.textContent = '↕';
+                    icon.className = "text-xs text-slate-400";
+                }
+            }
+
+            filteredData.sort((a, b) => {
+                let valA = a[key];
+                let valB = b[key];
+
+                if (key === 'salary') {
+                    valA = parseFloat(valA.replace(/[^0-9.-]+/g, ""));
+                    valB = parseFloat(valB.replace(/[^0-9.-]+/g, ""));
+                }
+
+                if (valA < valB) return currentSortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable();
+        }
+
+        // Paginador dinámico
+        function renderPagination() {
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            const startIdx = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+            const endIdx = Math.min(currentPage * itemsPerPage, totalItems);
+
+            document.getElementById('pagination-info').textContent = 
+                `Mostrando ${startIdx} a ${endIdx} de ${totalItems} registros`;
+
+            const controls = document.getElementById('pagination-controls');
+            controls.innerHTML = '';
+
+            // Botón Anterior
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '‹';
+            prevBtn.className = `px-2.5 py-1 rounded-md text-sm ${currentPage === 1 ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 hover:bg-slate-700'}`;
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderTable(); } };
+            controls.appendChild(prevBtn);
+
+            // Números de Página
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                if (i === currentPage) {
+                    pageBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow';
+                } else {
+                    pageBtn.className = 'px-2.5 py-1 rounded-md text-xs text-slate-300 hover:bg-slate-700';
+                }
+                pageBtn.onclick = () => { currentPage = i; renderTable(); };
+                controls.appendChild(pageBtn);
+            }
+
+            // Botón Siguiente
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '›';
+            nextBtn.className = `px-2.5 py-1 rounded-md text-sm ${currentPage === totalPages ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 hover:bg-slate-700'}`;
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTable(); } };
+            controls.appendChild(nextBtn);
+        }
+
+        // Aplicar Preset de Estilos
+        function applyPreset(presetKey) {
+            const p = presets[presetKey];
+            if (!p) return;
+
+            document.getElementById('cfg-header-bg').value = p.headerBg;
+            document.getElementById('cfg-header-text').value = p.headerText;
+            document.getElementById('cfg-row-odd').value = p.rowOdd;
+            document.getElementById('cfg-row-even').value = p.rowEven;
+            document.getElementById('cfg-hover-bg').value = p.hoverBg;
+            document.getElementById('cfg-hover-text').value = p.hoverText;
+            document.getElementById('cfg-cell-text').value = p.cellText;
+            document.getElementById('cfg-padding').value = p.padding;
+            document.getElementById('cfg-radius').value = p.radius;
+            document.getElementById('cfg-transition').value = p.transition;
+
+            updateStyles();
+        }
+
+        // Actualización dinámicas de CSS en el DOM y Visor de Código
+        function updateStyles() {
+            const headerBg = document.getElementById('cfg-header-bg').value;
+            const headerText = document.getElementById('cfg-header-text').value;
+            const rowOdd = document.getElementById('cfg-row-odd').value;
+            const rowEven = document.getElementById('cfg-row-even').value;
+            const hoverBg = document.getElementById('cfg-hover-bg').value;
+            const hoverText = document.getElementById('cfg-hover-text').value;
+            const cellText = document.getElementById('cfg-cell-text').value;
+            
+            const paddingVal = document.getElementById('cfg-padding').value;
+            const radiusVal = document.getElementById('cfg-radius').value;
+            const transitionVal = (document.getElementById('cfg-transition').value / 10).toFixed(1);
+
+            // Actualizar etiquetas explicativas de los sliders
+            document.getElementById('lbl-padding').textContent = `${paddingVal}px ${parseInt(paddingVal) + 4}px`;
+            document.getElementById('lbl-radius').textContent = `${radiusVal}px`;
+            document.getElementById('lbl-transition').textContent = `${transitionVal}s`;
+
+            // Construcción del código CSS3
+            const generatedCSS = `/* ========================================================
+   ESTILOS DE TABLA CON FILAS CEBREADAS Y HOVER
+======================================================== */
+
+/* Contenedor principal con bordes redondeados y desbordamiento */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: ${radiusVal}px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Estructura base de la tabla */
+table.custom-styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+}
+
+/* Encabezado estético de la tabla */
+table.custom-styled-table th {
+  background-color: ${headerBg};
+  color: ${headerText};
+  padding: ${paddingVal}px ${parseInt(paddingVal) + 4}px;
+  text-align: left;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Celdas de datos generales */
+table.custom-styled-table td {
+  padding: ${paddingVal}px ${parseInt(paddingVal) + 4}px;
+  color: ${cellText};
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* --------------------------------------------------------
+   1. CONCEPTOS DE FILAS CEBREADAS (Zebra Striping)
+-------------------------------------------------------- */
+table.custom-styled-table tbody tr:nth-child(odd) {
+  background-color: ${rowOdd};
+}
+
+table.custom-styled-table tbody tr:nth-child(even) {
+  background-color: ${rowEven};
+}
+
+/* --------------------------------------------------------
+   2. EFECTO HOVER SOBRE LA FILA ACTIVA
+-------------------------------------------------------- */
+table.custom-styled-table tbody tr {
+  transition: background-color ${transitionVal}s ease-in-out, color ${transitionVal}s ease-in-out;
+}
+
+table.custom-styled-table tbody tr:hover {
+  background-color: ${hoverBg} !important;
+  color: ${hoverText} !important;
+  cursor: pointer;
+}
+
+table.custom-styled-table tbody tr:hover td {
+  color: ${hoverText} !important;
+}`;
+
+            // Inyectar en la etiqueta style dinámica
+            document.getElementById('dynamic-table-styles').innerHTML = generatedCSS;
+
+            // Actualizar vista de código CSS
+            document.getElementById('code-css').textContent = generatedCSS;
+
+            // Generar vista del código HTML limpio de ejemplo
+            const generatedHTML = `<div class="table-container">
+  <table class="custom-styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Usuario</th>
+        <th>Rol / Puesto</th>
+        <th>Estado</th>
+        <th>Salario</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>USR-001</td>
+        <td>Juan Pérez</td>
+        <td>Desarrollador Backend</td>
+        <td>Activo</td>
+        <td>$3,800</td>
+      </tr>
+      <tr>
+        <td>USR-002</td>
+        <td>María García</td>
+        <td>Diseñadora UX/UI</td>
+        <td>Activo</td>
+        <td>$3,400</td>
+      </tr>
+      <tr>
+        <td>USR-003</td>
+        <td>Carlos Mendoza</td>
+        <td>DBA PostgreSQL</td>
+        <td>Inactivo</td>
+        <td>$4,100</td>
+      </tr>
+      <tr>
+        <td>USR-004</td>
+        <td>Ana Martínez</td>
+        <td>Frontend Developer</td>
+        <td>Activo</td>
+        <td>$3,600</td>
+      </tr>
+    </tbody>
+  </table>
+</div>`;
+
+            document.getElementById('code-html').textContent = generatedHTML;
+        }
+
+        // Alternar entre pestañas de Vista Previa y Código
+        function switchTab(tab) {
+            const previewSec = document.getElementById('section-preview');
+            const codeSec = document.getElementById('section-code');
+            const previewBtn = document.getElementById('tab-preview-btn');
+            const codeBtn = document.getElementById('tab-code-btn');
+
+            if (tab === 'preview') {
+                previewSec.classList.remove('hidden');
+                codeSec.classList.add('hidden');
+
+                previewBtn.className = "px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm transition-all";
+                codeBtn.className = "px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all";
+            } else {
+                previewSec.classList.add('hidden');
+                codeSec.classList.remove('hidden');
+
+                codeBtn.className = "px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow-sm transition-all";
+                previewBtn.className = "px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all";
+            }
+        }
+
+        // Función para copiar código al portapapeles con compatibilidad
+        function copyCode(type) {
+            let textToCopy = '';
+            const cssCode = document.getElementById('code-css').textContent;
+            const htmlCode = document.getElementById('code-html').textContent;
+
+            if (type === 'css') textToCopy = cssCode;
+            else if (type === 'html') textToCopy = htmlCode;
+            else if (type === 'all') {
+                textToCopy = `<!-- HTML -->\n${htmlCode}\n\n/* CSS */\n${cssCode}`;
+            }
+
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showToast("¡Código copiado al portapapeles exitosamente!");
+            } catch (err) {
+                showToast("No se pudo copiar automáticamente. Copia el texto manualmente.");
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Mostrar aviso emergente Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.textContent = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

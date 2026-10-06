@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<!-- css : hojas de estilo cascada -->
+<!-- selector {} -->
+<!-- Ques es selector -->
+<!-- Etiqueta {}     -->
+<style>
+  *{margin: 0; 
+    padding: 0;
+  border:0} /* Quita los margenes y padding de todas las etiquetas */
+  /*Solo se utiliza una vez*/
+#titulo{
+    color: blue;
+    text-align: center;
+    text-transform: uppercase;/* Mayusculas */
+    font-weight: bold;/* Negrita */
+  }
+/*Le afecta a todos las etiquetas p*/
+
+  p {
+    color: red;
+    font-style: italic;
+    margin-top: 2em; /* 1em - 16px = 1M*/
+    margin-bottom: 4em;
+    text-align: center;
+  }   
+  /*Clase que puede heredarse muchas veces*/
+  .Importante{
+    Background-color: bisque;
+    border: 3px dashed black; /* Borde ; dotted,sólid, double, dashed */
+    padding: 1em;/* Espacio interno */
+  }
+
+.caja{
+    background-color: aquamarine;
+    /* border: 1px solid black; */
+    display: inline-block;
+    height: 60px;
+    text-align: center;
+    /* padding-left: 40px; */
+    padding-top: 40px;
+    width: 100px;/* Ancho */
+  }
+  .fundoing {
+    background-image: url("img/fondo.jpg");
+    background-size: auto;
+    background-position: button;
+  }
+
+  </style>
+<h1 id="titulo">Fundamentos de CSS</h1>
+
+  <p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+  </p>
+
+  <p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+  </p>
+
+   <p class="Importante fundoing">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+    lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nostrum a fugit eaque quaerat voluptate, voluptates porro aliquam corporis quos,
+    eum tempora ex. Dolores aut pariatur amet veniam, ipsa dolor.
+  </p>
+  <hr>
+  <br>
+  <div class="caja">
+    caja 1
+  </div>
+
+   <div class="caja">
+    caja 2
+  </div>
+  
+
+
+</body>
+</html>
